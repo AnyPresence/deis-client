@@ -27,7 +27,7 @@ class DeisClient
     if testing
       {}
     else
-      payload = name.nil? Hash.new : {"id": name}
+      payload = name.nil? ? Hash.new : {"id": name}
       response = RestClient.post apps_url, payload.to_json, {:Authorization => "token #{user_token}"}, content_type: :json, accept: :json
       JSON.parse response.body
     end
