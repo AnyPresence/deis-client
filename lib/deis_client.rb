@@ -2,14 +2,14 @@ require 'uri'
 require 'rest-client'
 
 class DeisClient
-  attr_accessor deis_controller, user_token, testing
+  attr_accessor :deis_controller, :user_token, :testing
 
-  def initialize(controller_uri: controller, username: user, password: pass, mock: mock)
+  def initialize(controller_uri, username, password, mock=false)
     testing = mock
-    raise new Error("No username or password detected!") if user.nil? || pass.nil?
-    raise new Error("You must specify a URI for Deis controller!") unless controller =~ /\A#{URI::regexp}\z/
-    deis_controller = controller
-    login(user, pass)
+    raise new Error("No username or password detected!") if username.nil? || password.nil?
+    raise new Error("You must specify a URI for Deis controller!") unless controller_uri =~ /\A#{URI::regexp}\z/
+    deis_controller = controller_uri
+    login(username, password) unless testing
     self
   end
 
