@@ -28,16 +28,12 @@ class DeisClient
       {}
     else
       payload = name.nil? ? Hash.new : {"id": name}
-      response = RestClient.post apps_url, payload.to_json, auth, content_type: :json, accept: :json
+      response = RestClient.post apps_url, payload.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
       JSON.parse response.body
     end
   end
 
   private
-
-  def auth
-    {"Authorization" => "token #{@user_token}"}
-  end
 
   def login_url
     "#{@deis_controller}/v1/auth/login/"

@@ -9,6 +9,7 @@ class DeisClientTest < Minitest::Test
                             true
                            )
     assert client.user_token == "ABC123"
+    assert client.app_create("fluffy") == {}
   end
 
 end
