@@ -42,7 +42,7 @@ class DeisClientTest < Minitest::Test
   end
 
 
-  def test_config_set
+  def test_config
     assert_raises(DeisError) {
       @client.config_set(nil, nil)
     }
@@ -56,6 +56,12 @@ class DeisClientTest < Minitest::Test
       assert response["values"].has_key?("PLATFORM")
       assert response["values"].has_value?("world")
       assert response["values"].has_value?("deis")
+
+      stored_config = @client.config_get(app_name)
+      assert stored_config.has_key?("HELLO")
+      assert stored_config.has_key?("PLATFORM")
+      assert stored_config.has_value?("world")
+      assert stored_config.has_value?("deis")
       response = @client.app_destroy(app_name)
     end
   end

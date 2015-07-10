@@ -68,6 +68,17 @@ class DeisClient
     end
   end
 
+  def config_get(app_name)
+    raise DeisError.new("App name is required") if app_name.nil?
+    if @mock
+      {}
+    else
+      response = RestClient.get config_url(app_name), :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      hash = JSON.parse response.body
+      hash["values"]
+    end
+  end
+
   def command_run(app_name, command)
     raise DeisError.new("App name is required") if app_name.nil?
     raise DeisError.new("Command string is required") if command.nil?
