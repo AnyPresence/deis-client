@@ -48,6 +48,17 @@ class DeisClient
     end
   end
 
+  def config_set(app_name, config_hash={})
+    raise DeisError.new("App name is required") if app_name.nil?
+    if @mock || config_hash.empty?
+      {}
+    else
+      payload = {"values": config_hash}
+      response = RestClient.post config_url(app_name), payload.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      JSON.parse response.body
+    end
+  end
+
   private
 
   def login_url
@@ -56,6 +67,10 @@ class DeisClient
 
   def apps_url
     "#{@deis_controller}/v1/apps/"
+  end
+
+  def config_url(app_name)
+    "#{apps_url}#{app_name}/config"
   end
 
   def keys_url

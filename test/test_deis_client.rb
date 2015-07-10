@@ -20,10 +20,12 @@ class DeisClientTest < Minitest::Test
 
 
   def test_app_create
-      response = @client.app_create("fluffy")
-      assert response["id"] == "fluffy" || @mock
-      assert response["owner"] == @username || @mock
-      assert response["uuid"] || @mock
+      response = @client.app_create(nil)
+      unless @mock
+        assert response["id"]
+        assert response["owner"] == @username
+        assert response["uuid"]
+      end
   end
 
   def test_key_add
@@ -31,9 +33,28 @@ class DeisClientTest < Minitest::Test
         @client.key_add(nil, nil)
       }
       response = @client.key_add(@username, @key)
-      assert response["id"] == @username || @mock
-      assert response["owner"] == @username || @mock
-      assert response["public"] == @key || @mock
+      unless @mock
+        assert response["id"]
+        assert response["owner"] == @username
+        assert response["public"] == @key
+      end
   end
 
+
+  def test_config_set
+    assert_raises(DeisError) {
+      @client.config_set(nil, nil)
+    }
+    response = @client.app_create(nil)
+    app_name = response["id"]
+    unless @mock
+      assert @client.config_set(app_name, {}).empty?
+      configs = {"HELLO" => "world", "PLATFORM" => "deis"}
+      response = @client.config_set(app_name, configs)
+      assert response["values"].has_key?("HELLO")
+      assert response["values"].has_key?("PLATFORM")
+      assert response["values"].has_value?("world")
+      assert response["values"].has_value?("deis")
+    end
+  end
 end
