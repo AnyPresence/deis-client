@@ -59,6 +59,18 @@ class DeisClient
     end
   end
 
+  def command_run(app_name, command)
+    raise DeisError.new("App name is required") if app_name.nil?
+    raise DeisError.new("Command string is required") if command.nil?
+    if @mock
+      {}
+    else
+      payload = {"command": command}
+      response = RestClient.post command_run_url(app_name), payload.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      JSON.parse response.body
+    end
+  end
+
   private
 
   def login_url
@@ -70,7 +82,11 @@ class DeisClient
   end
 
   def config_url(app_name)
-    "#{apps_url}#{app_name}/config"
+    "#{apps_url}#{app_name}/config/"
+  end
+
+  def command_run_url(app_name)
+    "#{apps_url}#{app_name}/run/"
   end
 
   def keys_url

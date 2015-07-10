@@ -7,8 +7,8 @@ class DeisClientTest < Minitest::Test
   end
 
   def setup
-    @username = ENV['DEIS_USER'] || 'humpty'
-    @password = ENV['DEIS_PASSWORD'] || 'dumpty'
+    @username = ENV['DEIS_ADMIN_USER'] || 'humpty'
+    @password = ENV['DEIS_ADMIN_PASSWORD'] || 'dumpty'
     @mock = true
     @client = DeisClient.new(ENV['DEIS_CONTROLLER'] || "http://controller.example.com",
                             @username,
@@ -55,6 +55,17 @@ class DeisClientTest < Minitest::Test
       assert response["values"].has_key?("PLATFORM")
       assert response["values"].has_value?("world")
       assert response["values"].has_value?("deis")
+    end
+  end
+
+  def test_command_run
+    assert_raises(DeisError) {
+      @client.config_set(nil, nil)
+    }
+    unless @mock
+      response = @client.command_run("app_build", "echo stuff")
+      assert response.first == 0
+      assert response.last == "stuff\r\n"
     end
   end
 end
