@@ -26,13 +26,22 @@ class DeisClient
     end
   end
 
-  def app_create(name)
+  def app_create(app_name)
     if @mock
       {}
     else
-      payload = name.nil? ? Hash.new : {"id": name}
+      payload = app_name.nil? ? Hash.new : {"id": app_name}
       response = RestClient.post apps_url, payload.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
       JSON.parse response.body
+    end
+  end
+
+  def app_destroy(app_name)
+    raise DeisError.new("App name is required") if app_name.nil?
+    if @mock
+      {}
+    else
+      response = RestClient.delete app_url(app_name), :Authorization => "token #{@user_token}", content_type: :json, accept: :json
     end
   end
 
@@ -81,12 +90,16 @@ class DeisClient
     "#{@deis_controller}/v1/apps/"
   end
 
+  def app_url(app_name)
+    "#{apps_url}#{app_name}/"
+  end
+
   def config_url(app_name)
-    "#{apps_url}#{app_name}/config/"
+    "#{app_url(app_name)}config/"
   end
 
   def command_run_url(app_name)
-    "#{apps_url}#{app_name}/run/"
+    "#{app_url(app_name)}run/"
   end
 
   def keys_url

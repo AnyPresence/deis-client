@@ -25,6 +25,7 @@ class DeisClientTest < Minitest::Test
         assert response["id"]
         assert response["owner"] == @username
         assert response["uuid"]
+        response = @client.app_destroy(response["id"])
       end
   end
 
@@ -55,6 +56,7 @@ class DeisClientTest < Minitest::Test
       assert response["values"].has_key?("PLATFORM")
       assert response["values"].has_value?("world")
       assert response["values"].has_value?("deis")
+      response = @client.app_destroy(app_name)
     end
   end
 
