@@ -1,13 +1,16 @@
 require 'uri'
 require 'rest-client'
 
+class DeisError < StandardError
+end
+
 class DeisClient
   attr_reader :user_token
 
   def initialize(controller_uri, username, password, mock=false)
     @mock = mock
-    raise new Error("No username or password detected!") if username.nil? || password.nil?
-    raise new Error("You must specify a URI for Deis controller!") unless controller_uri =~ /\A#{URI::regexp}\z/
+    raise DeisError.new("No username or password detected!") if username.nil? || password.nil?
+    raise DeisError.new("You must specify a URI for Deis controller!") unless controller_uri =~ /\A#{URI::regexp}\z/
     @deis_controller = controller_uri
     login(username, password)
     self
@@ -33,6 +36,18 @@ class DeisClient
     end
   end
 
+  def key_add(user_name, ssh_public_key)
+    raise DeisError.new("Username is required") if user_name.nil?
+    raise DeisError.new("SSH key is required") if ssh_public_key.nil?
+    if @mock
+      {}
+    else
+      payload = {"id": user_name, "public": ssh_public_key}
+      response = RestClient.post keys_url, payload.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      JSON.parse response.body
+    end
+  end
+
   private
 
   def login_url
@@ -41,5 +56,9 @@ class DeisClient
 
   def apps_url
     "#{@deis_controller}/v1/apps/"
+  end
+
+  def keys_url
+    "#{@deis_controller}/v1/keys/"
   end
 end

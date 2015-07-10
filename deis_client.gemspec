@@ -9,6 +9,6 @@ Gem::Specification.new do |s|
   s.files = `git ls-files -z`.split("\0")
   s.homepage = 'http://rubygems.org/gems/deis_client'
   s.license = 'MIT'
-  s.add_dependency('rest-client', '>= 1.8.0', '< 2.0')
+  s.add_dependency('rest-client', '>= 1.6.7', '< 2.0')
   s.required_ruby_version = '>= 1.9.3'
 end
