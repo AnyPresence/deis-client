@@ -22,10 +22,13 @@ class DeisClientTest < Minitest::Test
   def test_app_create
       response = @client.app_create(nil)
       unless @mock
+        app = response["id"]
         assert response["id"]
         assert response["owner"] == @username
         assert response["uuid"]
-        response = @client.app_destroy(response["id"])
+        response = @client.logs_get(app)
+        assert response.size > 0
+        response = @client.app_destroy(app)
       end
   end
 
