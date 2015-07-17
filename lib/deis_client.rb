@@ -55,7 +55,6 @@ class DeisClient
     else
       payload = {process_type => process_count}
       response = RestClient.post scale_url(app_name), payload.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
-      puts "\n\nresponse code is #{response.code}"
       response.code == 204
     end
   end
