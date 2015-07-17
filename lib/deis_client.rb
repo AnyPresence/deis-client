@@ -45,6 +45,21 @@ class DeisClient
     end
   end
 
+  def app_scale(app_name, process_type, process_count)
+    raise DeisError.new("App name is required") if app_name.nil?
+    raise DeisError.new("Process type is required. Supported values are 'web' or 'worker'") unless ["web", "worker"].include? process_type
+    raise DeisError.new("Process count is required") unless process_count.is_a? Fixnum
+    raise DeisError.new("Process count cannnot be negative") if process_count < 0
+    if @mock
+      false
+    else
+      payload = {process_type => process_count}
+      response = RestClient.post scale_url(app_name), payload.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      puts "\n\nresponse code is #{response.code}"
+      response.code == 204
+    end
+  end
+
   def key_add(user_name, ssh_public_key)
     raise DeisError.new("Username is required") if user_name.nil?
     raise DeisError.new("SSH key is required") if ssh_public_key.nil?
@@ -116,6 +131,10 @@ class DeisClient
 
   def config_url(app_name)
     "#{app_url(app_name)}config/"
+  end
+
+  def scale_url(app_name)
+    "#{app_url(app_name)}scale/"
   end
 
   def log_url(app_name)

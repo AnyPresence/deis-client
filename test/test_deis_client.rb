@@ -79,4 +79,16 @@ class DeisClientTest < Minitest::Test
       assert response.last == "stuff\r\n"
     end
   end
+
+  def test_app_scale
+    assert_raises(DeisError) {
+      @client.app_scale(nil, "nil", "nil")
+    }
+    assert_raises(DeisError) {
+      @client.app_scale("my-app", "proc", 1)
+    }
+    assert_raises(DeisError) {
+      @client.app_scale("my-app", "web", -1)
+    }
+  end
 end
