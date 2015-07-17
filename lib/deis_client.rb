@@ -65,8 +65,7 @@ class DeisClient
       false
     else
       response = RestClient.post app_restart_url(app_name), {}.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
-      result = JSON.parse response.body
-      result.all? { |container| container.state.downcase == "up" }
+      response.code == 200
     end
   end
 
