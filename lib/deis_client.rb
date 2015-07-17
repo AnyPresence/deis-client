@@ -59,6 +59,18 @@ class DeisClient
     end
   end
 
+  def app_restart(app_name)
+    raise DeisError.new("App name is required") if app_name.nil?
+    if @mock
+      false
+    else
+      response = RestClient.post app_restart_url(app_name), :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      result = JSON.parse response.body
+      result.all? { |container| container.state.downcase == "up" }
+    end
+  end
+
+
   def key_add(user_name, ssh_public_key)
     raise DeisError.new("Username is required") if user_name.nil?
     raise DeisError.new("SSH key is required") if ssh_public_key.nil?
@@ -126,6 +138,10 @@ class DeisClient
 
   def app_url(app_name)
     "#{apps_url}#{app_name}/"
+  end
+
+  def app_restart_url(app_name)
+    "#{app_url(app_name)}containers/restart/"
   end
 
   def config_url(app_name)

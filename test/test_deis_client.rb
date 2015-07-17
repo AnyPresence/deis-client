@@ -91,4 +91,10 @@ class DeisClientTest < Minitest::Test
       @client.app_scale("my-app", "web", -1)
     }
   end
+
+  def test_app_restart
+    assert_raises(DeisError) {
+      @client.app_restart(nil)
+    }
+  end
 end
