@@ -10,6 +10,7 @@ class DeisClientTest < Minitest::Test
     @username = ENV['DEIS_ADMIN_USER'] || 'humpty'
     @password = ENV['DEIS_ADMIN_PASSWORD'] || 'dumpty'
     @mock = true
+    @instance_name = 'linear-seashore'
     @client = DeisClient.new(ENV['DEIS_CONTROLLER'] || "http://controller.example.com",
                             @username,
                             @password,
@@ -32,6 +33,7 @@ class DeisClientTest < Minitest::Test
       end
   end
 
+=begin
   def test_key_add
       assert_raises(DeisError) {
         @client.key_add(nil, nil)
@@ -43,7 +45,7 @@ class DeisClientTest < Minitest::Test
         assert response["public"] == @key
       end
   end
-
+=end
 
   def test_config
     assert_raises(DeisError) {
@@ -65,6 +67,10 @@ class DeisClientTest < Minitest::Test
       assert stored_config.has_key?("PLATFORM")
       assert stored_config.has_value?("world")
       assert stored_config.has_value?("deis")
+
+      response = @client.config_set(app_name, "BUILDPACK_URL" => "https://github.com/AnyPresence/heroku-buildpack-node")
+      assert response["values"].has_key?("BUILDPACK_URL")
+
       response = @client.app_destroy(app_name)
     end
   end
@@ -74,7 +80,7 @@ class DeisClientTest < Minitest::Test
       @client.config_set(nil, nil)
     }
     unless @mock
-      response = @client.command_run("app_build", "echo stuff")
+      response = @client.command_run(@instance_name, "echo stuff")
       assert response.first == 0
       assert response.last == "stuff\r\n"
     end
@@ -90,11 +96,17 @@ class DeisClientTest < Minitest::Test
     assert_raises(DeisError) {
       @client.app_scale("my-app", "web", -1)
     }
+    unless @instance_name.nil?
+      @client.app_scale(@instance_name, "web", 2)
+    end
   end
 
   def test_app_restart
     assert_raises(DeisError) {
       @client.app_restart(nil)
     }
+    unless @instance_name.nil?
+      @client.app_restart(@instance_name)
+    end
   end
 end
