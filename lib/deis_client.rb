@@ -7,6 +7,8 @@ end
 class DeisClient
   attr_reader :user_token
 
+  REQUEST_TIMEOUT = 60 #seconds
+
   def initialize(controller_uri, username, password, mock=false)
     @mock = mock
     raise DeisError.new("No username or password detected!") if username.nil? || password.nil?
@@ -20,7 +22,8 @@ class DeisClient
     if @mock
       @user_token = "ABC123"
     else
-      response = RestClient.post login_url, {"username": username, "password": password}.to_json, content_type: :json, accept: :json
+      payload = {"username": username, "password": password}
+      response = RestClient::Request.execute(method: :post, url: login_url, payload: payload.to_json, timeout: REQUEST_TIMEOUT, headers: {content_type: :json, accept: :json})
       body = JSON.parse response.body
       @user_token = body.fetch('token')
     end
@@ -31,7 +34,7 @@ class DeisClient
       {}
     else
       payload = app_name.nil? ? Hash.new : {"id": app_name}
-      response = RestClient.post apps_url, payload.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      response = RestClient::Request.execute(method: :post, url: apps_url, payload: payload.to_json, timeout: REQUEST_TIMEOUT, headers: headers)
       JSON.parse response.body
     end
   end
@@ -41,7 +44,8 @@ class DeisClient
     if @mock
       {}
     else
-      response = RestClient.delete app_url(app_name), :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      response = RestClient::Request.execute(method: :delete, url: app_url(app_name), timeout: REQUEST_TIMEOUT, headers: headers)
+      response.code == 204
     end
   end
 
@@ -54,7 +58,7 @@ class DeisClient
       false
     else
       payload = {process_type => process_count}
-      response = RestClient.post scale_url(app_name), payload.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      response = RestClient::Request.execute(method: :post, url: scale_url(app_name), payload: payload.to_json, timeout: REQUEST_TIMEOUT, headers: headers)
       response.code == 204
     end
   end
@@ -64,7 +68,7 @@ class DeisClient
     if @mock
       false
     else
-      response = RestClient.post app_restart_url(app_name), {}.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      response = RestClient::Request.execute(method: :post, url: app_restart_url(app_name), payload: {}.to_json, timeout: REQUEST_TIMEOUT, headers: headers)
       response.code == 200
     end
   end
@@ -77,7 +81,7 @@ class DeisClient
       {}
     else
       payload = {"id": user_name, "public": ssh_public_key}
-      response = RestClient.post keys_url, payload.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      response = RestClient::Request.execute(method: :post, url: keys_url, payload: payload.to_json, timeout: REQUEST_TIMEOUT, headers: headers)
       JSON.parse response.body
     end
   end
@@ -88,7 +92,7 @@ class DeisClient
       {}
     else
       payload = {"values": config_hash}
-      response = RestClient.post config_url(app_name), payload.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      response = RestClient::Request.execute(method: :post, url: config_url(app_name), payload: payload.to_json, timeout: REQUEST_TIMEOUT, headers: headers)
       JSON.parse response.body
     end
   end
@@ -98,7 +102,7 @@ class DeisClient
     if @mock
       {}
     else
-      response = RestClient.get config_url(app_name), :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      response = RestClient::Request.execute(method: :get, url: config_url(app_name), timeout: REQUEST_TIMEOUT, headers: headers)
       hash = JSON.parse response.body
       hash["values"]
     end
@@ -109,7 +113,7 @@ class DeisClient
     if @mock
       {}
     else
-      RestClient.get log_url(app_name), :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      RestClient::Request.execute(method: :get, url: log_url(app_name), timeout: REQUEST_TIMEOUT, headers: headers)
     end
   end
 
@@ -120,7 +124,7 @@ class DeisClient
       {}
     else
       payload = {"command": command}
-      response = RestClient.post command_run_url(app_name), payload.to_json, :Authorization => "token #{@user_token}", content_type: :json, accept: :json
+      response = RestClient::Request.execute(method: :post, url: command_run_url(app_name), payload: payload.to_json, timeout: REQUEST_TIMEOUT, headers: headers)
       JSON.parse response.body
     end
   end
@@ -161,5 +165,9 @@ class DeisClient
 
   def keys_url
     "#{@deis_controller}/v1/keys/"
+  end
+
+  def headers
+    {:Authorization => "token #{@user_token}", :content_type => :json, :accept => :json}
   end
 end
