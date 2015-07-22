@@ -10,7 +10,7 @@ class DeisClientTest < Minitest::Test
     @username = ENV['DEIS_ADMIN_USER'] || 'humpty'
     @password = ENV['DEIS_ADMIN_PASSWORD'] || 'dumpty'
     @mock = true
-    @instance_name = 'linear-seashore'
+    @instance_name = 'luxury-jumpsuit'
     @client = DeisClient.new(ENV['DEIS_CONTROLLER'] || "http://controller.example.com",
                             @username,
                             @password,
@@ -82,7 +82,7 @@ class DeisClientTest < Minitest::Test
     unless @mock
       response = @client.command_run(@instance_name, "echo stuff")
       assert response.first == 0
-      assert response.last == "stuff\r\n"
+      assert response.last.end_with? "stuff\r\n"
     end
   end
 
