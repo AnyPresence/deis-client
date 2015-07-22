@@ -7,7 +7,7 @@ end
 class DeisClient
   attr_reader :user_token
 
-  REQUEST_TIMEOUT = 60 #seconds
+  REQUEST_TIMEOUT = 180 #seconds
 
   def initialize(controller_uri, username, password, mock=false)
     @mock = mock
