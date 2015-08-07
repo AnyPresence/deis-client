@@ -8,6 +8,7 @@ class DeisClient
   attr_reader :user_token
 
   REQUEST_TIMEOUT = 180 #seconds
+  VERIFY_SSL = false
 
   def initialize(controller_uri, username, password, mock=false)
     @mock = mock
@@ -23,7 +24,7 @@ class DeisClient
       @user_token = "ABC123"
     else
       payload = {"username": username, "password": password}
-      response = RestClient::Request.execute(method: :post, url: login_url, payload: payload.to_json, timeout: REQUEST_TIMEOUT, headers: {content_type: :json, accept: :json})
+      response = RestClient::Request.execute(method: :post, url: login_url, payload: payload.to_json, timeout: REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, headers: {content_type: :json, accept: :json})
       body = JSON.parse response.body
       @user_token = body.fetch('token')
     end
@@ -34,7 +35,7 @@ class DeisClient
       {}
     else
       payload = app_name.nil? ? Hash.new : {"id": app_name}
-      response = RestClient::Request.execute(method: :post, url: apps_url, payload: payload.to_json, timeout: REQUEST_TIMEOUT, headers: headers)
+      response = RestClient::Request.execute(method: :post, url: apps_url, payload: payload.to_json, timeout: REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, headers: headers)
       JSON.parse response.body
     end
   end
@@ -44,7 +45,7 @@ class DeisClient
     if @mock
       {}
     else
-      response = RestClient::Request.execute(method: :delete, url: app_url(app_name), timeout: REQUEST_TIMEOUT, headers: headers)
+      response = RestClient::Request.execute(method: :delete, url: app_url(app_name), timeout: REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, headers: headers)
       response.code == 204
     end
   end
@@ -58,7 +59,7 @@ class DeisClient
       false
     else
       payload = {process_type => process_count}
-      response = RestClient::Request.execute(method: :post, url: scale_url(app_name), payload: payload.to_json, timeout: REQUEST_TIMEOUT, headers: headers)
+      response = RestClient::Request.execute(method: :post, url: scale_url(app_name), payload: payload.to_json, timeout: REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, headers: headers)
       response.code == 204
     end
   end
@@ -68,7 +69,7 @@ class DeisClient
     if @mock
       false
     else
-      response = RestClient::Request.execute(method: :post, url: app_restart_url(app_name), payload: {}.to_json, timeout: REQUEST_TIMEOUT, headers: headers)
+      response = RestClient::Request.execute(method: :post, url: app_restart_url(app_name), payload: {}.to_json, timeout: REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, headers: headers)
       response.code == 200
     end
   end
@@ -81,7 +82,7 @@ class DeisClient
       {}
     else
       payload = {"id": user_name, "public": ssh_public_key}
-      response = RestClient::Request.execute(method: :post, url: keys_url, payload: payload.to_json, timeout: REQUEST_TIMEOUT, headers: headers)
+      response = RestClient::Request.execute(method: :post, url: keys_url, payload: payload.to_json, timeout: REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, headers: headers)
       JSON.parse response.body
     end
   end
@@ -92,7 +93,7 @@ class DeisClient
       {}
     else
       payload = {"values": config_hash}
-      response = RestClient::Request.execute(method: :post, url: config_url(app_name), payload: payload.to_json, timeout: REQUEST_TIMEOUT, headers: headers)
+      response = RestClient::Request.execute(method: :post, url: config_url(app_name), payload: payload.to_json, timeout: REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, headers: headers)
       JSON.parse response.body
     end
   end
@@ -102,7 +103,7 @@ class DeisClient
     if @mock
       {}
     else
-      response = RestClient::Request.execute(method: :get, url: config_url(app_name), timeout: REQUEST_TIMEOUT, headers: headers)
+      response = RestClient::Request.execute(method: :get, url: config_url(app_name), timeout: REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, headers: headers)
       hash = JSON.parse response.body
       hash["values"]
     end
@@ -113,7 +114,7 @@ class DeisClient
     if @mock
       {}
     else
-      RestClient::Request.execute(method: :get, url: log_url(app_name), timeout: REQUEST_TIMEOUT, headers: headers)
+      RestClient::Request.execute(method: :get, url: log_url(app_name), timeout: REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, headers: headers)
     end
   end
 
@@ -124,7 +125,7 @@ class DeisClient
       {}
     else
       payload = {"command": command}
-      response = RestClient::Request.execute(method: :post, url: command_run_url(app_name), payload: payload.to_json, timeout: REQUEST_TIMEOUT, headers: headers)
+      response = RestClient::Request.execute(method: :post, url: command_run_url(app_name), payload: payload.to_json, timeout: REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, headers: headers)
       JSON.parse response.body
     end
   end
