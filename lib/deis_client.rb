@@ -93,8 +93,15 @@ class DeisClient
       {}
     else
       payload = {"values" => config_hash}
+      puts "\nPOSTING to #{config_url(app_name)}\nPayload: #{payload}"
+      begin
       response = RestClient::Request.execute(:method => :post, :url => config_url(app_name), :payload => payload.to_json, :timeout => REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, :headers => headers)
       JSON.parse response.body
+      rescue => e
+        puts "\nError #{e}"
+        puts e.try(:body)
+        puts e.backtrace.join("\n")
+      end
     end
   end
 
