@@ -82,7 +82,7 @@ class DeisClientTest < Minitest::Test
     unless @mock
       response = @client.command_run(@instance_name, "echo stuff")
       assert response.first == 0
-      assert response.last.end_with? "stuff\r\n"
+      assert response.last.strip.end_with? "stuff"
     end
   end
 
