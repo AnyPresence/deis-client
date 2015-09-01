@@ -118,14 +118,14 @@ class DeisClient
     end
   end
 
-  def command_run(app_name, command)
+  def command_run(app_name, command, timeout_in_seconds=REQUEST_TIMEOUT)
     raise DeisError.new("App name is required") if app_name.nil?
     raise DeisError.new("Command string is required") if command.nil?
     if @mock
       {}
     else
       payload = {"command" => command}
-      response = RestClient::Request.execute(:method => :post, :url => command_run_url(app_name), :payload => payload.to_json, :timeout => REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, :headers => headers)
+      response = RestClient::Request.execute(:method => :post, :url => command_run_url(app_name), :payload => payload.to_json, :timeout => timeout_in_seconds, :verify_ssl => VERIFY_SSL, :headers => headers)
       JSON.parse response.body
     end
   end
