@@ -87,6 +87,19 @@ class DeisClient
     end
   end
 
+  def cert_add(common_name, certificate, private_key)
+    raise DeisError.new("Common name is required") if common_name.nil?
+    raise DeisError.new("Certificate name is required") if certificate.nil?
+    raise DeisError.new("Private key is required") if private_key.nil?
+    if @mock
+      {}
+    else
+      payload = {"common_name" => common_name, "certificate" => certificate, "key" => private_key}
+      response = RestClient::Request.execute(:method => :post, :url => certs_url, :payload => payload.to_json, :timeout => REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, :headers => headers)
+      JSON.parse response.body
+    end
+  end
+
   def domain_add(app_name, domain_name)
     raise DeisError.new("App name is required") if app_name.nil?
     raise DeisError.new("Domain name is required") if domain_name.nil?
@@ -178,6 +191,10 @@ class DeisClient
 
   def command_run_url(app_name)
     "#{app_url(app_name)}run/"
+  end
+
+  def certs_url
+    "#{@deis_controller}/v1/certs/"
   end
 
   def keys_url

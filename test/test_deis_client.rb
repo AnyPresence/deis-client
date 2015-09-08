@@ -119,4 +119,14 @@ class DeisClientTest < Minitest::Test
       assert response["domain"] == "foo.example.com" if response.has_key?("domain")
     end
   end
+
+  def test_certs_add
+    assert_raises(DeisError) {
+      @client.cert_add(nil,nil,nil)
+    }
+    unless @instance_name.nil?
+      response = @client.cert_add("foo.example.com", "CERT", "KEY")
+      assert response
+    end
+  end
 end
