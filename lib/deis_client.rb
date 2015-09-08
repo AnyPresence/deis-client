@@ -87,6 +87,18 @@ class DeisClient
     end
   end
 
+  def domain_add(app_name, domain_name)
+    raise DeisError.new("App name is required") if app_name.nil?
+    raise DeisError.new("Domain name is required") if domain_name.nil?
+    if @mock
+      {}
+    else
+      payload = {"domain" => domain_name}
+      response = RestClient::Request.execute(:method => :post, :url => domains_url(app_name), :payload => payload.to_json, :timeout => REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, :headers => headers)
+      JSON.parse response.body
+    end
+  end
+
   def config_set(app_name, config_hash={})
     raise DeisError.new("App name is required") if app_name.nil?
     if @mock || config_hash.empty?
@@ -138,6 +150,10 @@ class DeisClient
 
   def apps_url
     "#{@deis_controller}/v1/apps/"
+  end
+
+  def domains_url(app_name)
+    "#{app_url(app_name)}domains/"
   end
 
   def app_url(app_name)

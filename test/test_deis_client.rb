@@ -109,4 +109,14 @@ class DeisClientTest < Minitest::Test
       @client.app_restart(@instance_name)
     end
   end
+
+  def test_domain_add
+    assert_raises(DeisError) {
+      @client.domain_add(nil,nil)
+    }
+    unless @instance_name.nil?
+      response = @client.domain_add(@instance_name,"foo.example.com")
+      assert response["domain"] == "foo.example.com" if response.has_key?("domain")
+    end
+  end
 end
