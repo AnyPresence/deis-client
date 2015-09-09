@@ -133,13 +133,22 @@ class DeisClientTest < Minitest::Test
     end
   end
 
-  def test_certs_add
+  def test_cert_add
     assert_raises(DeisError) {
       @client.cert_add(nil,nil,nil)
     }
     unless @instance_name.nil?
       response = @client.cert_add("foo.example.com", "CERT", "KEY")
       assert response
+    end
+  end
+
+  def test_cert_remove
+    assert_raises(DeisError) {
+      @client.cert_remove(nil)
+    }
+    unless @instance_name.nil?
+      assert @client.cert_remove("foo.example.com")
     end
   end
 end

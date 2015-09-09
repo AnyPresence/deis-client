@@ -100,6 +100,17 @@ class DeisClient
     end
   end
 
+  def cert_remove(common_name)
+    raise DeisError.new("Common name is required") if common_name.nil?
+    if @mock
+      {}
+    else
+      url = "#{certs_url}#{common_name}"
+      response = RestClient::Request.execute(:method => :delete, :url => url, :timeout => REQUEST_TIMEOUT, :verify_ssl => VERIFY_SSL, :headers => headers)
+      response.code == 204
+    end
+  end
+
   def domain_add(app_name, domain_name)
     raise DeisError.new("App name is required") if app_name.nil?
     raise DeisError.new("Domain name is required") if domain_name.nil?
