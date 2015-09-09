@@ -120,6 +120,19 @@ class DeisClientTest < Minitest::Test
     end
   end
 
+  def test_domain_remove
+    assert_raises(DeisError) {
+      @client.domain_remove(nil,nil)
+    }
+    unless @instance_name.nil?
+      response = @client.domain_add(@instance_name,"foo.example.com")
+      if response.has_key?("domain")
+        assert response["domain"] == "foo.example.com"
+        assert @client.domain_remove(@instance_name,"foo.example.com")
+      end
+    end
+  end
+
   def test_certs_add
     assert_raises(DeisError) {
       @client.cert_add(nil,nil,nil)
