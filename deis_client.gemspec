@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name  = 'deis-client'
-  s.version = '0.0.2'
-  s.date = '2015-09-01'
+  s.version = '0.0.3'
+  s.date = '2015-09-09'
   s.summary = "Deis REST operations in a Ruby gem."
   s.description = "Deis Platform REST (V1.5) client for Ruby."
   s.authors = ["AnyPresence"]
